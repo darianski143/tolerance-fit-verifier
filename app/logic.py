@@ -1,11 +1,6 @@
-
-# Baza de date simplificata pentru ISO 286 (Interval 18-50mm)
-# Valorile sunt in microni (um)
-
 def get_it_grade(grade, diameter):
-    """Returneaza valoarea tolerantei standard (IT) in microni."""
-    # Intervalele standard ISO: (18, 30], (30, 50]
-    # Daca diameter = 30, intra la 18-30.
+    """Returns the standard tolerance (IT) value in microns."""
+    # ISO standard ranges: (18, 30], (30, 50]
     
     if 18 < diameter <= 30:
         range_key = '18-30'
@@ -14,7 +9,7 @@ def get_it_grade(grade, diameter):
     else:
         return None
 
-    # Valori IT standard (selectie comuna)
+    # Standard IT values (common selection)
     it_values = {
         '18-30': {5: 9, 6: 13, 7: 21, 8: 33, 9: 52, 10: 84, 11: 130},
         '30-50': {5: 11, 6: 16, 7: 25, 8: 39, 9: 62, 10: 100, 11: 160}
@@ -27,9 +22,9 @@ def get_it_grade(grade, diameter):
 
 def get_fundamental_deviation(letter, diameter, it_grade):
     """
-    Returneaza abaterea fundamentala in microni.
-    Pentru Alezaje (Litere Mari): Returneaza EI (Abaterea Inferioara) sau ES in cazuri speciale.
-    Pentru Arbori (Litere Mici): Returneaza es (Abaterea Superioara) sau ei in cazuri speciale.
+    Returns the fundamental deviation in microns.
+    For Holes (Uppercase): Returns EI (Lower Deviation) or ES in special cases.
+    For Shafts (Lowercase): Returns es (Upper Deviation) or ei in special cases.
     """
     if 18 < diameter <= 30:
         range_key = '18-30'
@@ -38,14 +33,11 @@ def get_fundamental_deviation(letter, diameter, it_grade):
     else:
         return None
 
-    # Simplificare: Abateri fundamentale comune (microni)
-    # H/h au abatere 0.
+    # Fundamental deviations (microns)
+    # H/h have 0 deviation.
     
-    # Arbori (es pentru a-h, ei pentru j-zc) - Aici simplificam logica de baza
-    # Valorile de mai jos sunt aproximari standard pentru pozitiile campurilor
-    
-    # Dictionar: 'litera': {'range': valoare_fundamentala}
-    # Pentru arbori (shafts) - litere mici
+    # Shafts (es for a-h, ei for j-zc)
+    # Dictionary: 'letter': {'range': fundamental_value}
     shaft_devs = {
         'd': {'18-30': -65, '30-50': -80}, # es
         'e': {'18-30': -40, '30-50': -50}, # es
@@ -56,15 +48,11 @@ def get_fundamental_deviation(letter, diameter, it_grade):
         'm': {'18-30': 8,   '30-50': 9},   # ei
         'n': {'18-30': 15,  '30-50': 17},  # ei
         'p': {'18-30': 22,  '30-50': 26},  # ei
-        'r': {'18-30': 28,  '30-50': 34},  # ei (valori medii geometrice approx pt demo)
+        'r': {'18-30': 28,  '30-50': 34},  # ei
         's': {'18-30': 35,  '30-50': 43},  # ei
     }
 
-    # Alezaje (holes) - litere mari (Regula generala: Simetric fata de arbori pt aceeasi litera)
-    # H: EI = 0
-    # F: EI = +valoare (de la f)
-    # P: ES = -valoare (de la p) -> Aici e mai complicat, folosim regula generala ISO:
-    # Hole Fundamental Dev = - Shaft Fundamental Dev (cu exceptii, dar pt demo e ok)
+    # Holes (uppercase) - General rule: Symmetric to shafts for the same letter
     
     letter_base = letter.lower()
     is_hole = letter.isupper()
@@ -75,25 +63,22 @@ def get_fundamental_deviation(letter, diameter, it_grade):
     val = shaft_devs[letter_base][range_key]
 
     if is_hole:
-        # Pentru H, EI = 0.
+        # For H, EI = 0.
         if letter == 'H': return 0
         
-        # Pentru A-H (Gap), EI = -es(shaft)
-        # Pentru J-ZC (Press), ES = -ei(shaft) + Delta (Delta e complex, ignoram pt simplificare tema)
-        # Simplificare majora pentru tema scolara:
+        # For A-H (Gap), EI = -es(shaft)
+        # For J-ZC (Press), ES = -ei(shaft) + Delta (Delta ignored for simplicity)
         if letter_base in ['d', 'e', 'f', 'g']:
             return -val # EI = -es
         elif letter_base in ['k', 'm', 'n', 'p', 'r', 's']:
-            # Aici e mai nuantat. De obicei se calculeaza ES.
-            # Dar pentru a determina tipul ajustajului, ne bazam pe pozitia relativa.
-            # Vom returna o valoare de referinta "fundamentala" inversata.
+            # Simplified: returning inverted fundamental reference value
             return -val 
             
     return val
 
 def calculate_fit_details(nominal, hole_str, shaft_str):
     """
-    Calculeaza detaliile ajustajului.
+    Calculates fit details.
     Ex: nominal=30, hole_str="H7", shaft_str="g6"
     """
     # Parse inputs
@@ -103,52 +88,47 @@ def calculate_fit_details(nominal, hole_str, shaft_str):
     shaft_letter = ''.join([c for c in shaft_str if c.isalpha()])
     shaft_grade = int(''.join([c for c in shaft_str if c.isdigit()]))
 
-    # 1. Valori IT (Toleranta)
+    # 1. IT Values (Tolerance)
     tol_hole = get_it_grade(hole_grade, nominal)
     tol_shaft = get_it_grade(shaft_grade, nominal)
 
     if tol_hole is None or tol_shaft is None:
-        return {"error": "Grad de toleranta sau diametru in afara intervalului suportat."}
+        return {"error": "Tolerance grade or diameter out of supported range."}
 
-    # 2. Abateri Fundamentale
-    # Alezaj (Hole)
-    # Daca e H, EI = 0, ES = EI + IT
-    # Daca e P (presat), ES = val_fundamentala (negativa), EI = ES - IT
-    
-    # Calcul Alezaj
+    # 2. Fundamental Deviations
+    # Hole Calculation
     if hole_letter == 'H':
         EI = 0
         ES = tol_hole
-    elif hole_letter in ['F', 'G']: # Joc
-        EI = get_fundamental_deviation(hole_letter, nominal, hole_grade) # returneaza val pozitiva
+    elif hole_letter in ['F', 'G']: # Clearance
+        EI = get_fundamental_deviation(hole_letter, nominal, hole_grade) # positive value
         ES = EI + tol_hole
-    elif hole_letter in ['M', 'N', 'P', 'R', 'S']: # Intermediar/Presat
-        # Aici regula ISO e complexa (ES = -ei + delta). 
-        # Folosim o aproximare didactica: ES este definit de abaterea fundamentala (negativa)
-        fund_dev = get_fundamental_deviation(hole_letter, nominal, hole_grade) # va fi negativ
+    elif hole_letter in ['M', 'N', 'P', 'R', 'S']: # Transition/Press
+        # Simplified approximation: ES defined by fundamental deviation (negative)
+        fund_dev = get_fundamental_deviation(hole_letter, nominal, hole_grade) # negative
         ES = fund_dev
         EI = ES - tol_hole
     else:
         EI = 0; ES = tol_hole # Fallback
 
-    # Calcul Arbore
+    # Shaft Calculation
     if shaft_letter == 'h':
         es = 0
         ei = -tol_shaft
-    elif shaft_letter in ['d', 'e', 'f', 'g']: # Joc
-        es = get_fundamental_deviation(shaft_letter, nominal, shaft_grade) # negativ
+    elif shaft_letter in ['d', 'e', 'f', 'g']: # Clearance
+        es = get_fundamental_deviation(shaft_letter, nominal, shaft_grade) # negative
         ei = es - tol_shaft
-    elif shaft_letter in ['k', 'm', 'n', 'p', 'r', 's']: # Intermediar/Presat
-        ei = get_fundamental_deviation(shaft_letter, nominal, shaft_grade) # pozitiv
+    elif shaft_letter in ['k', 'm', 'n', 'p', 'r', 's']: # Transition/Press
+        ei = get_fundamental_deviation(shaft_letter, nominal, shaft_grade) # positive
         es = ei + tol_shaft
     else:
         es = 0; ei = -tol_shaft
 
-    # 3. Calcul Jocuri / Strangeri
-    # Joc Maxim (Jmax) = ES - ei
-    # Joc Minim (Jmin) = EI - es
-    # Strangere Maxima (Smax) = es - EI (negativul lui Jmin)
-    # Strangere Minima (Smin) = ei - ES (negativul lui Jmax)
+    # 3. Calculate Clearance / Interference
+    # Max Clearance (Jmax) = ES - ei
+    # Min Clearance (Jmin) = EI - es
+    # Max Interference (Smax) = es - EI (negative of Jmin)
+    # Min Interference (Smin) = ei - ES (negative of Jmax)
 
     val1 = ES - ei
     val2 = EI - es
@@ -162,7 +142,7 @@ def calculate_fit_details(nominal, hole_str, shaft_str):
     else:
         fit_type = "Intermediar (Transition)"
 
-    # 4. Sistem
+    # 4. System
     system = "Necunoscut"
     if hole_letter == 'H':
         system = "Alezaj Unitar (Hole Basis)"
@@ -171,11 +151,11 @@ def calculate_fit_details(nominal, hole_str, shaft_str):
     else:
         system = "Combinat / Nestandard"
 
-    # 5. Preferential
-    # Lista ajustaje preferentiale uzuale (ISO 286)
+    # 5. Preferred Fits
+    # Common preferred fits (ISO 286)
     preferred_fits = [
-        "H7/f7", "H7/g6", "H7/h6", "H7/k6", "H7/n6", "H7/p6", "H7/s6", # Alezaj unitar
-        "F7/h6", "G7/h6", "H7/h6", "K7/h6", "N7/h6", "P7/h6", "S7/h6"  # Arbore unitar
+        "H7/f7", "H7/g6", "H7/h6", "H7/k6", "H7/n6", "H7/p6", "H7/s6", # Hole Basis
+        "F7/h6", "G7/h6", "H7/h6", "K7/h6", "N7/h6", "P7/h6", "S7/h6"  # Shaft Basis
     ]
     
     current_fit = f"{hole_letter}{hole_grade}/{shaft_letter}{shaft_grade}"
@@ -183,7 +163,7 @@ def calculate_fit_details(nominal, hole_str, shaft_str):
 
     suggestion = ""
     if not is_preferred:
-        # Sugestie simpla: pastreaza sistemul si cauta cel mai apropiat
+        # Simple suggestion based on system
         if system == "Alezaj Unitar (Hole Basis)":
             suggestion = "Incearca un ajustaj preferential: H7/g6 (Joc), H7/k6 (Intermediar) sau H7/p6 (Strangere)."
         elif system == "Arbore Unitar (Shaft Basis)":

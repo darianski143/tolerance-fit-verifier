@@ -15,14 +15,14 @@ def index():
             shaft = request.form.get('shaft')
 
             if not (20 <= nominal <= 50):
-                error = "Diametrul trebuie sa fie intre 20 si 50 mm."
+                error = "Diameter must be between 20 and 50 mm."
             else:
                 result = calculate_fit_details(nominal, hole, shaft)
                 if "error" in result:
                     error = result["error"]
                     result = None
         except ValueError:
-            error = "Te rog introdu valori numerice valide."
+            error = "Please enter valid numeric values."
 
     return render_template('index.html', result=result, error=error)
 
