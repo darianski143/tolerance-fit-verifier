@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificare Ajustaje (20-50mm)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Calculator Ajustaje ISO</h1>
+        <p style="text-align:center; color: #666;">Pentru intervalul 20 mm - 50 mm</p>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="nominal">Diametru Nominal (mm):</label>
+                <input type="number" step="0.01" id="nominal" name="nominal" min="20" max="50" required placeholder="Ex: 30">
+            </div>
+            
+            <div class="form-group">
+                <label for="hole">Toleranta Alezaj (Hole):</label>
+                <input type="text" id="hole" name="hole" required placeholder="Ex: H7" pattern="[A-Z]+[0-9]+">
+                <small>Folositi litere mari (ex: H7, G6, P7)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="shaft">Toleranta Arbore (Shaft):</label>
+                <input type="text" id="shaft" name="shaft" required placeholder="Ex: g6" pattern="[a-z]+[0-9]+">
+                <small>Folositi litere mici (ex: h6, g6, p6)</small>
+            </div>
+
+            <button type="submit">Calculeaza</button>
+        </form>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if result %}
+            <div class="result">
+                <h2>Rezultate pentru {{ result.nominal }} mm {{ result.fit_str }}</h2>
+                
+                <p><strong>Tip Ajustaj:</strong> 
+                    {% if "Strangere" in result.fit_type %}
+                        <span class="badge badge-danger">{{ result.fit_type }}</span>
+                    {% elif "Joc" in result.fit_type %}
+                        <span class="badge badge-success">{{ result.fit_type }}</span>
+                    {% else %}
+                        <span class="badge badge-warning">{{ result.fit_type }}</span>
+                    {% endif %}
+                </p>
+
+                <p><strong>Sistem:</strong> {{ result.system }}</p>
+
+                <p><strong>Este Preferential?</strong> 
+                    {% if result.is_preferred %}
+                        <span style="color:green; font-weight:bold;">DA</span>
+                    {% else %}
+                        <span style="color:red; font-weight:bold;">NU</span>
+                        <br>
+                        <em>Sugestie: {{ result.suggestion }}</em>
+                    {% endif %}
+                </p>
+
+                <h3>Detalii Calcul (Microni)</h3>
+                <table>
+                    <tr>
+                        <th>Element</th>
+                        <th>Simbol</th>
+                        <th>Abatere Sup. (ES/es)</th>
+                        <th>Abatere Inf. (EI/ei)</th>
+                    </tr>
+                    <tr>
+                        <td>Alezaj</td>
+                        <td>{{ request.form.get('hole') }}</td>
+                        <td>{{ result.hole_dims.ES }} µm</td>
+                        <td>{{ result.hole_dims.EI }} µm</td>
+                    </tr>
+                    <tr>
+                        <td>Arbore</td>
+                        <td>{{ request.form.get('shaft') }}</td>
+                        <td>{{ result.shaft_dims.es }} µm</td>
+                        <td>{{ result.shaft_dims.ei }} µm</td>
+                    </tr>
+                </table>
+                
+                <p style="margin-top:1rem; font-size:0.9rem;">
+                    * Valorile pozitive indica material in plus fata de linia zero, cele negative in minus.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
