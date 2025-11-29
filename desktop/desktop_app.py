@@ -89,12 +89,19 @@ def main() -> None:
     url = f"http://127.0.0.1:{port}"
 
     start_flask_server(port)
-    if not wait_for_server(url):
+    if not wait_for_server(url, timeout=15.0):
         print(
             "[desktop] Could not reach the local server. "
-            "Check that all dependencies are installed.",
+            "Check that all dependencies are installed and not blocked by firewall.",
             file=sys.stderr,
         )
+        try:
+            # Surface Werkzeug/Flask startup errors, if any
+            # Attempt a single request to see the exact exception
+            with url_request.urlopen(url, timeout=1):
+                pass
+        except Exception as exc:
+            print(f"[desktop] Server start error: {exc}", file=sys.stderr)
         sys.exit(1)
 
     open_window(url)

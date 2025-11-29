@@ -41,15 +41,36 @@ py -3.12 -m venv .venv312
   desktop/desktop_app.py
 ```
 
-### macOS / Linux
+### macOS
 ```bash
-export PYTHONPATH=src
-python -m pip install -r requirements.txt
-python -m pip install pyinstaller
-python -m PyInstaller --noconsole --onefile --paths src \
-  --add-data "src/app/templates:app/templates" \
-  --add-data "src/app/static:app/static" \
-  desktop/desktop_app.py
+# setup
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt pyinstaller pyobjc
+
+# build via spec (preferred)
+pyinstaller --clean --noconfirm desktop/desktop_app.spec
+
+# or build via CLI flags
+pyinstaller --clean --windowed --paths src \
+   --add-data "src/app/templates:app/templates" \
+   --add-data "src/app/static:app/static" \
+   --name "ToleranceFitVerifier" \
+   desktop/desktop_app.py
+
+# run
+open dist/ToleranceFitVerifier.app
+
+# troubleshoot: see logs if it closes
+cd dist/ToleranceFitVerifier.app/Contents/MacOS && ./ToleranceFitVerifier
+```
+
+Optional DMG:
+```bash
+hdiutil create -volname "Tolerance Fit Verifier" \
+   -srcfolder "dist/ToleranceFitVerifier.app" \
+   -ov -format UDZO "ToleranceFitVerifier.dmg"
 ```
 
 ## Project structure

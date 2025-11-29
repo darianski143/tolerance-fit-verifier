@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['desktop_app.py'],
+    ['desktop/desktop_app.py'],
     pathex=['src'],
     binaries=[],
     datas=[('src/app/templates', 'app/templates'), ('src/app/static', 'app/static')],
@@ -19,20 +19,32 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
-    name='desktop_app',
+    exclude_binaries=True,
+    name='ToleranceFitVerifier',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='ToleranceFitVerifier',
+)
+app = BUNDLE(
+    coll,
+    name='ToleranceFitVerifier.app',
+    icon=None,
+    bundle_identifier=None,
 )
