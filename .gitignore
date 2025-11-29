@@ -1,0 +1,7 @@
+# Build artifacts
+build/
+dist/
+
+# Local virtual environments
+.venv/
+.venv312/
