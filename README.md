@@ -21,6 +21,20 @@ Web app + desktop wrapper for ISO 286 fits (range 20–50 mm). Desktop window de
    ```
 4) Open `http://127.0.0.1:5000`.
 
+### Linux (web only)
+- Dev server:
+   ```bash
+   ./scripts/run-web.sh
+   ```
+- Production (Waitress):
+   ```bash
+   ./scripts/run-web.sh prod
+   ```
+- Customize host/port via env vars:
+   ```bash
+   HOST=0.0.0.0 PORT=8000 ./scripts/run-web.sh prod
+   ```
+
 ## Run (desktop, dev)
 ```bash
 set PYTHONPATH=src   # PowerShell: $env:PYTHONPATH="src"
@@ -28,6 +42,8 @@ python desktop/desktop_app.py
 ```
 
 ## Build executable
+
+Note: On Linux, prefer running as a web app (see above). Desktop packaging is only supported for Windows and macOS.
 
 ### Windows (Python 3.12)
 ```bash
