@@ -51,10 +51,7 @@ py -3.12 -m venv .venv312
 .venv312\Scripts\python -m pip install --upgrade pip
 .venv312\Scripts\python -m pip install -r requirements.txt
 .venv312\Scripts\python -m pip install pyinstaller
-.venv312\Scripts\python -m PyInstaller --noconsole --onefile --paths src ^
-  --add-data "src\\app\\templates;app/templates" ^
-  --add-data "src\\app\\static;app/static" ^
-  desktop/desktop_app.py
+.venv312\Scripts\python -m PyInstaller --noconsole --onefile --paths src --add-data "src\\app\\templates;app/templates" --add-data "src\\app\\static;app/static" desktop/desktop_app.py
 ```
 
 ### macOS

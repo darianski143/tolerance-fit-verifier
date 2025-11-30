@@ -5,5 +5,6 @@ dist/
 # Local virtual environments
 .venv/
 .venv312/
-src/app/__pycache__/
-src/app/__pycache__/__init__.cpython-312.pyc
+# Python cache and compiled files (generalized)
+__pycache__/
+*.pyc
