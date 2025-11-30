@@ -19,3 +19,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+-------------------------------------------------------------------------------
+Additional Notices & Scope
+-------------------------------------------------------------------------------
+1. Functional Scope: This project implements ISO 286 fit / tolerance
+	calculations only for nominal diameters strictly within 20 mm – 50 mm.
+	Use outside this range is unsupported and may yield incorrect results.
+2. Engineering Use: Calculated values are for guidance. They do not replace
+	professional engineering judgment, standards verification, or safety
+	analysis. Always validate critical dimensions independently.
+3. Platform Packaging: On Linux the project is provided as a web application
+	(Flask/Waitress). Desktop wrapper executables (pywebview) are only
+	packaged for Windows and macOS. This does not alter the license terms.
+4. Third‑Party Components (retain their own licenses):
+	- Flask (BSD-3-Clause)
+	- Waitress (Zope Public License 2.1 / ZPL)
+	- pywebview (MIT)
+	Review each project’s upstream repository for full license texts.
+5. Trademarks: ISO and other standard names are referenced descriptively and
+	remain the property of their respective owners.
+6. No Warranty of Accuracy: While care has been taken, tolerance tables and
+	deviation simplifications may omit nuances of the full ISO specification.
+	Report issues via the issue tracker if discrepancies are found.
+
+These notices clarify scope and dependency attribution and do not modify the
+permissions or disclaimer granted by the MIT License above.
