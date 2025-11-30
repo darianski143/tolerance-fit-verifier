@@ -3,9 +3,9 @@
 
 a = Analysis(
     ['desktop_app.py'],
-    pathex=['src'],
+    pathex=['..', 'src'],
     binaries=[],
-    datas=[('src/app/templates', 'app/templates'), ('src/app/static', 'app/static')],
+    datas=[('../src/app/templates', 'app/templates'), ('../src/app/static', 'app/static')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
