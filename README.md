@@ -1,6 +1,6 @@
 # Tolerance Fit Verifier
 
-Web app + desktop wrapper for ISO 286 fits (range 20–50 mm). Desktop window defaults to 1043x777.
+Web app + desktop wrapper for ISO 286 fits (range 20–50 mm). Desktop window defaults to 1043x800.
 
 ## Features
 - Fit type: clearance, transition, or interference.
