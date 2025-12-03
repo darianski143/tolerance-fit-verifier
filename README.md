@@ -1,5 +1,9 @@
 # Tolerance Fit Verifier
 
+<p align="center">
+  <img src="src/app/tolerance-fir-verifier.png" alt="Icon" width="256" height="256">
+</p>
+
 Web app + desktop wrapper for ISO 286 fits (range 20–50 mm). Desktop window defaults to 1043x800.
 
 ## Features
@@ -97,3 +101,24 @@ hdiutil create -volname "Tolerance Fit Verifier" \
 - `src/app/tolerance-fir-verifier.*`: App icons (.ico, .icns, .png).
 - `desktop/desktop_app.py`: desktop launcher (pywebview + Waitress).
 - `requirements.txt`: dependencies.
+
+
+## Screenshots
+
+### Windows
+
+<p align="center">
+  <img src="src/app/windows.png" alt="Windows">
+</p>
+
+### MacOS
+
+<p align="center">
+  <img src="src/app/macos.png" alt="MacOS">
+</p>
+
+### Linux
+
+<p align="center">
+  <img src="src/app/ubuntu.png" alt="Ubuntu">
+</p>
