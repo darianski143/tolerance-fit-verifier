@@ -5,7 +5,7 @@ a = Analysis(
     ['desktop/desktop_app.py'],
     pathex=['src'],
     binaries=[],
-    datas=[('src/app/templates', 'app/templates'), ('src/app/static', 'app/static')],
+    datas=[('src/app/templates', 'app/templates'), ('src/app/static', 'app/static'), ('src/app/tolerance-fir-verifier.icns', 'app'), ('src/app/tolerance-fir-verifier.png', 'app')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -32,6 +32,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['src/app/tolerance-fir-verifier.icns'],
 )
 coll = COLLECT(
     exe,
@@ -45,6 +46,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='ToleranceFitVerifier.app',
-    icon=None,
+    icon='src/app/tolerance-fir-verifier.icns',
     bundle_identifier=None,
 )
