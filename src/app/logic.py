@@ -1,5 +1,5 @@
 def get_it_grade(grade, diameter):
-    """Returns the standard tolerance (IT) value in microns."""
+    """Returns the standard tolerance (IT) value in millimeters."""
     # ISO standard ranges: (18, 30], (30, 50]
     
     if 18 < diameter <= 30:
@@ -16,13 +16,13 @@ def get_it_grade(grade, diameter):
     }
     
     try:
-        return it_values[range_key][int(grade)]
+        return it_values[range_key][int(grade)] / 1000.0
     except (KeyError, ValueError):
         return None
 
 def get_fundamental_deviation(letter, diameter, it_grade):
     """
-    Returns the fundamental deviation in microns.
+    Returns the fundamental deviation in millimeters.
     For Holes (Uppercase): Returns EI (Lower Deviation) or ES in special cases.
     For Shafts (Lowercase): Returns es (Upper Deviation) or ei in special cases.
     """
@@ -60,7 +60,7 @@ def get_fundamental_deviation(letter, diameter, it_grade):
     if letter_base not in shaft_devs:
         return 0 # Default fallback
 
-    val = shaft_devs[letter_base][range_key]
+    val = shaft_devs[letter_base][range_key] / 1000.0
 
     if is_hole:
         # For H, EI = 0.
