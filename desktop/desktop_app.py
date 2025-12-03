@@ -11,6 +11,7 @@ Windows, macOS, and Linux.
 
 from __future__ import annotations
 
+import platform
 import socket
 import sys
 import threading
@@ -65,15 +66,79 @@ def start_flask_server(port: int) -> None:
     server_thread.start()
 
 
+def get_asset_path(filename: str) -> str | None:
+    """
+    Resolve the path to a static asset (e.g., icon), handling both
+    local development and PyInstaller builds.
+    """
+    # 1. Check if running in a PyInstaller bundle
+    if hasattr(sys, "_MEIPASS"):
+        # In a one-file build, assets are unpacked to sys._MEIPASS
+        # We assume the user adds data as "src/app/<file>;app"
+        candidate = Path(sys._MEIPASS) / "app" / filename
+        if candidate.exists():
+            return str(candidate)
+
+    # 2. Check local source structure
+    # BASE_DIR is 'desktop/', so we go up one level to root, then src/app
+    local_path = BASE_DIR.parent / "src" / "app" / filename
+    if local_path.exists():
+        return str(local_path)
+
+    return None
+
+
 def open_window(url: str) -> None:
     """Try to open the embedded window; fall back to system browser if needed."""
+    # Determine correct icon extension for the OS
+    system = platform.system()
+    if system == "Windows":
+        icon_filename = "tolerance-fir-verifier.ico"
+    elif system == "Darwin":  # macOS
+        icon_filename = "tolerance-fir-verifier.icns"
+    else:  # Linux
+        icon_filename = "tolerance-fir-verifier.png"
+
+    icon_path = get_asset_path(icon_filename)
+
     try:
-        webview.create_window(
-            "Tolerance Fit Verifier",
-            url,
-            width=1043,
-            height=800,
-        )
+        # Attempt to create the window with the icon if available
+        if icon_path:
+            try:
+                webview.create_window(
+                    "Tolerance Fit Verifier",
+                    url,
+                    width=1043,
+                    height=800,
+                    icon=icon_path,
+                )
+            except Exception as e:
+                print(f"[desktop] Failed to create window with icon ({e}). Retrying without icon.", file=sys.stderr)
+                webview.create_window(
+                    "Tolerance Fit Verifier",
+                    url,
+                    width=1043,
+                    height=800,
+                )
+        else:
+            # If the specific icon for the OS is not found, try the png as a fallback (might work on some Linux/macOS setups)
+            fallback_path = get_asset_path("tolerance-fir-verifier.png")
+            if fallback_path and system != "Windows":
+                 webview.create_window(
+                    "Tolerance Fit Verifier",
+                    url,
+                    width=1043,
+                    height=800,
+                    icon=fallback_path,
+                )
+            else:
+                webview.create_window(
+                    "Tolerance Fit Verifier",
+                    url,
+                    width=1043,
+                    height=800,
+                )
+
         webview.start()
     except Exception as exc:  # noqa: BLE001 - surface any UI init errors
         print(
