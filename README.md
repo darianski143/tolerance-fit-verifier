@@ -51,7 +51,7 @@ py -3.12 -m venv .venv312
 .venv312\Scripts\python -m pip install --upgrade pip
 .venv312\Scripts\python -m pip install -r requirements.txt
 .venv312\Scripts\python -m pip install pyinstaller
-.venv312\Scripts\python -m PyInstaller --noconsole --onefile --paths src --add-data "src\\app\\templates;app/templates" --add-data "src\\app\\static;app/static" desktop/desktop_app.py
+.venv312\Scripts\python -m PyInstaller --noconsole --onefile --paths src --icon "src\app\tolerance-fir-verifier.ico" --add-data "src\app\templates;app/templates" --add-data "src\app\static;app/static" --add-data "src\app\tolerance-fir-verifier.ico;app" --add-data "src\app\tolerance-fir-verifier.png;app" desktop/desktop_app.py
 ```
 
 ### macOS
@@ -67,8 +67,11 @@ pyinstaller --clean --noconfirm desktop/desktop_app.spec
 
 # or build via CLI flags
 pyinstaller --clean --windowed --paths src \
+   --icon "src/app/tolerance-fir-verifier.icns" \
    --add-data "src/app/templates:app/templates" \
    --add-data "src/app/static:app/static" \
+   --add-data "src/app/tolerance-fir-verifier.icns:app" \
+   --add-data "src/app/tolerance-fir-verifier.png:app" \
    --name "ToleranceFitVerifier" \
    desktop/desktop_app.py
 
@@ -91,5 +94,6 @@ hdiutil create -volname "Tolerance Fit Verifier" \
 - `src/app/logic.py`: tolerance calculations.
 - `src/app/templates/`: UI.
 - `src/app/static/`: CSS/assets.
+- `src/app/tolerance-fir-verifier.*`: App icons (.ico, .icns, .png).
 - `desktop/desktop_app.py`: desktop launcher (pywebview + Waitress).
 - `requirements.txt`: dependencies.
